@@ -4,10 +4,8 @@
 <body>
   <h1>Inserisci i dati</h1>
   <form method="post" action="/process">
-    <label>Campo 1:</label>
-    <input type="text" name="field1" required><br>
-    <label>Campo 2:</label>
-    <input type="text" name="field2" required><br>
+    <label>Text Version: example "54 w 0x1234 99 u8 99", "1 w 0x32 1 i16 -12343"</label>
+    <input type="text" name="commandTxt" required><br>
     <button type="submit">Invia</button>
   </form>
   {% if result %}
