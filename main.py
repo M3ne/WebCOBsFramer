@@ -33,6 +33,7 @@ def splitTextCommand(cmd:str):
     return nodeID,command,index,subIndex,dataType,data
 
 def convertCommandStrToInt(cmdStr:str):
+    cmdStr = cmdStr.lower()
     cmdInt = -1
     if cmdStr == 'w':
         cmdInt = 1
@@ -120,7 +121,7 @@ async def process_form(
     
     payloadArr = []
     
-    payloadArr = convertCommandStrToInt(dataStr,dataTypeInt)
+    payloadArr = convertDataStrToBytes(dataStr,dataTypeInt)
     
     if payloadArr == []:
         result = "Command not recognized: last element wrong (number to be complient with the type)"
