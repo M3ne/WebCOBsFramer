@@ -74,27 +74,27 @@
     <script>
         
 
-    //    // Clear form function
-    //   function clearForm() {
-    //       document.getElementById('converterForm').reset();
-    //       document.getElementById('outputSection').style.display = 'none';
-    //       document.getElementById('loadingIndicator').style.display = 'none';
-    //   }
+        // Clear form function
+       function clearForm() {
+           document.getElementById('converterForm').reset();
+           document.getElementById('outputSection').style.display = 'none';
+           document.getElementById('loadingIndicator').style.display = 'none';
+       }
 
-    //    // Add some interactive feedback
-    //    document.addEventListener('DOMContentLoaded', function() {
-    //        const inputs = document.querySelectorAll('input, textarea, select');
-    //        inputs.forEach(input => {
-    //            input.addEventListener('focus', function() {
-    //                this.parentElement.style.transform = 'translateY(-2px)';
-    //                this.parentElement.style.transition = 'transform 0.3s ease';
-    //            });
-    //            
-    //            input.addEventListener('blur', function() {
-    //                this.parentElement.style.transform = 'translateY(0)';
-    //            });
-    //        });
-    //    });
+        // Add some interactive feedback
+        document.addEventListener('DOMContentLoaded', function() {
+            const inputs = document.querySelectorAll('input, textarea, select');
+            inputs.forEach(input => {
+                input.addEventListener('focus', function() {
+                    this.parentElement.style.transform = 'translateY(-2px)';
+                    this.parentElement.style.transition = 'transform 0.3s ease';
+                });
+                
+                input.addEventListener('blur', function() {
+                    this.parentElement.style.transform = 'translateY(0)';
+                });
+            });
+        });
     </script>
 </body>
 </html>
