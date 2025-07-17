@@ -3,6 +3,14 @@
 <head><title>Form CRC</title></head>
 <body>
   <h1>Inserisci i dati</h1>
+  <p>Several notes about data convertion: </br>
+    <ul>
+      <li>fist byte and last one will always be 0 to indicate start of packet and its end</li>
+      <li>second byte is the number of bytes for the next 0 expected</li>
+      <li>third byte will always be 16 (0x10) for type identification packet instruction</li>
+    </ul>
+  </p>
+  </br>
   <form method="post" action="/process">
     <label>Text Version: example "54 w 0x1234 99 u8 99", "1 w 0x32 1 i16 -12343"</label>
     <input type="text" name="commandTxt" required><br>

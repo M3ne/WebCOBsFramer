@@ -77,42 +77,42 @@ def convertDataStrToBytes(dataStr:str, dataTypeStr:str):
         if dataInt != 0 or dataInt != 1:
             return arr
         else:
-            arr += dataInt.to_bytes(1, byteorder='big')
+            arr += dataInt.to_bytes(1, byteorder='little')
     elif dataTypeStr == 'i8':
-        value = dataInt.to_bytes(1, byteorder='big',  signed=True )
+        value = dataInt.to_bytes(1, byteorder='little',  signed=True )
         arr += value
     elif dataTypeStr == 'u8':
         if dataInt < 0:
             return arr
         else:
-            value = dataInt.to_bytes(1, byteorder='big')
+            value = dataInt.to_bytes(1, byteorder='little')
             arr += value
     elif dataTypeStr == 'i16':
-        value = dataInt.to_bytes(2, byteorder='big',  signed=True )
+        value = dataInt.to_bytes(2, byteorder='little',  signed=True )
         arr += value
     elif dataTypeStr == 'u16':
         if dataInt < 0:
             return arr
         else:
-            value = dataInt.to_bytes(2, byteorder='big')
+            value = dataInt.to_bytes(2, byteorder='little')
             arr += value
     elif dataTypeStr == 'i32':
-        value = dataInt.to_bytes(4, byteorder='big',  signed=True )
+        value = dataInt.to_bytes(4, byteorder='little',  signed=True )
         arr += value
     elif dataTypeStr == 'u32':
         if dataInt < 0:
             return arr
         else:
-            value = dataInt.to_bytes(4, byteorder='big')
+            value = dataInt.to_bytes(4, byteorder='little')
             arr += value
     elif dataTypeStr == 'i64':
-        value = dataInt.to_bytes(8, byteorder='big',  signed=True )
+        value = dataInt.to_bytes(8, byteorder='little',  signed=True )
         arr += value
     elif dataTypeStr == 'u64': # u64
         if dataInt < 0:
             return arr
         else:
-            value = dataInt.to_bytes(8, byteorder='big')
+            value = dataInt.to_bytes(8, byteorder='little')
             arr += value
     
         
@@ -152,22 +152,23 @@ async def process_form(
 
     
     data_array = bytearray(b'')
-    data_array += nodeID.to_bytes(1, byteorder='big')
-    data_array += commandInt.to_bytes(1, byteorder='big')
-    data_array += index.to_bytes(2, byteorder='big')
-    data_array += subIndex.to_bytes(1, byteorder='big')
-    data_array += dataTypeInt.to_bytes(1, byteorder='big')
+    data_array += 0x10.to_bytes(1, byteorder='little')
+    data_array += nodeID.to_bytes(1, byteorder='little')
+    data_array += commandInt.to_bytes(1, byteorder='little')
+    data_array += index.to_bytes(2, byteorder='little')
+    data_array += subIndex.to_bytes(1, byteorder='little')
+    data_array += dataTypeInt.to_bytes(1, byteorder='little')
     data_array += payloadArr
 
     # Calculate CRC16
     crc = crc16_func(data_array)
-    crc_bytes = crc.to_bytes(2, byteorder='big')
+    crc_bytes = crc.to_bytes(2, byteorder='little')
 
     # Final frame = data + CRC
     frame = data_array + crc_bytes
 
     # Encode using COBS
-    encoded = cobs.encode(frame)
+    encoded  = 0x0.to_bytes(1, byteorder='little') + cobs.encode(frame) + 0x0.to_bytes(1, byteorder='little')
 
     result_list = [f"0x{b:02X}" for b in encoded]
     result = f"Ricevuto: [{', '.join(result_list)}]"
