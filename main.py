@@ -69,30 +69,53 @@ def convertDataTypeStrToInt(dataTypeStr:str):
     
     return dataTypeInt
 
-def convertDataStrToBytes(dataStr:str, dataTypeInt:int):
-    arr = []
+def convertDataStrToBytes(dataStr:str, dataTypeStr:str):
+    arr =  bytearray(b'')
     #TODO: change this in case of other data type are handled
     dataInt = int(dataStr)
-    if dataTypeInt == 0: # boolean
-        if value != 0 or value != 1:
+    if dataTypeStr == 'boolean':
+        if dataInt != 0 or dataInt != 1:
             return arr
         else:
-            arr.append(value.to_bytes(1, byteorder='big'))
-    elif dataTypeInt == 1 or dataTypeInt == 5: # i8 or u8
-        value = dataInt.to_bytes(1, byteorder='big')
-        arr.append(value)
-    elif dataTypeInt == 2 or dataTypeInt == 6: # i16 or u16
-        value = dataInt.to_bytes(2, byteorder='big')
-        arr.append(value)
-    elif dataTypeInt == 3 or dataTypeInt == 7: # i32 or u32
-        value = dataInt.to_bytes(4, byteorder='big')
-        arr.append(value)
-    elif dataTypeInt == 4 or dataTypeInt == 8: # i64 or u64
-        value = dataInt.to_bytes(8, byteorder='big')
-        arr.append(value)
+            arr += dataInt.to_bytes(1, byteorder='big')
+    elif dataTypeStr == 'i8':
+        value = dataInt.to_bytes(1, byteorder='big',  signed=True )
+        arr += value
+    elif dataTypeStr == 'u8':
+        if dataInt < 0:
+            return arr
+        else:
+            value = dataInt.to_bytes(1, byteorder='big')
+            arr += value
+    elif dataTypeStr == 'i16':
+        value = dataInt.to_bytes(2, byteorder='big',  signed=True )
+        arr += value
+    elif dataTypeStr == 'u16':
+        if dataInt < 0:
+            return arr
+        else:
+            value = dataInt.to_bytes(2, byteorder='big')
+            arr += value
+    elif dataTypeStr == 'i32':
+        value = dataInt.to_bytes(4, byteorder='big',  signed=True )
+        arr += value
+    elif dataTypeStr == 'u32':
+        if dataInt < 0:
+            return arr
+        else:
+            value = dataInt.to_bytes(4, byteorder='big')
+            arr += value
+    elif dataTypeStr == 'i64':
+        value = dataInt.to_bytes(8, byteorder='big',  signed=True )
+        arr += value
+    elif dataTypeStr == 'u64': # u64
+        if dataInt < 0:
+            return arr
+        else:
+            value = dataInt.to_bytes(8, byteorder='big')
+            arr += value
     
         
-    
     return arr
     
 
@@ -121,22 +144,20 @@ async def process_form(
     
     payloadArr = []
     
-    payloadArr = convertDataStrToBytes(dataStr,dataTypeInt)
+    payloadArr = convertDataStrToBytes(dataStr,dataTypeStr)
     
     if payloadArr == []:
         result = "Command not recognized: last element wrong (number to be complient with the type)"
         return templates.TemplateResponse("form.html", {"request": request, "result": result})
 
     
-
-    
-    data_array = []
-    data_array.append(nodeID.to_bytes(1, byteorder='big'))
-    data_array.append(commandInt.to_bytes(1, byteorder='big'))
-    data_array.append(index.to_bytes(2, byteorder='big'))
-    data_array.append(subIndex.to_bytes(1, byteorder='big'))
-    data_array.append(dataTypeInt.to_bytes(1, byteorder='big'))
-    data_array.append(payloadArr)
+    data_array = bytearray(b'')
+    data_array += nodeID.to_bytes(1, byteorder='big')
+    data_array += commandInt.to_bytes(1, byteorder='big')
+    data_array += index.to_bytes(2, byteorder='big')
+    data_array += subIndex.to_bytes(1, byteorder='big')
+    data_array += dataTypeInt.to_bytes(1, byteorder='big')
+    data_array += payloadArr
 
     # Calculate CRC16
     crc = crc16_func(data_array)
