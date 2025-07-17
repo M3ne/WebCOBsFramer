@@ -28,14 +28,33 @@ async def form_page(request: Request):
 def splitTextCommand(cmd:str):
     cmd = cmd.strip()
     cmd_splitted= cmd.split(' ',6)
-    nodeID = int(cmd_splitted[0])
-    command = cmd_splitted[1]
-    index = int(cmd_splitted[2], 16)
-    subIndex = int(cmd_splitted[3])
-    dataType = cmd_splitted[4]
-    data = cmd_splitted[5]
+    
+    nodeID = 0
+    command = ''
+    index = 0
+    subIndex = 0
+    dataType = ''
+    data = ''
+    err = 1
+    try:
+        if len(cmd_splitted) == 6:
+            nodeID = int(cmd_splitted[0])
+            command = cmd_splitted[1]
+            index = int(cmd_splitted[2], 16)
+            
+            if cmd_splitted[3].count('0x') > 0:
+                subIndex = int(cmd_splitted[3], base=16)
+            else:
+                subIndex = int(cmd_splitted[3])
+                
+            dataType = cmd_splitted[4]
+            data = cmd_splitted[5]
+            err = 0
 
-    return nodeID,command,index,subIndex,dataType,data
+    except ValueError:
+        err = 2
+
+    return nodeID,command,index,subIndex,dataType,data,err
 
 def convertCommandStrToInt(cmdStr:str):
     cmdStr = cmdStr.lower()
@@ -77,48 +96,55 @@ def convertDataTypeStrToInt(dataTypeStr:str):
 def convertDataStrToBytes(dataStr:str, dataTypeStr:str):
     arr =  bytearray(b'')
     #TODO: change this in case of other data type are handled
-    dataInt = int(dataStr)
-    if dataTypeStr == 'boolean':
-        if dataInt != 0 or dataInt != 1:
-            return arr
+    try:
+        if dataStr.count('0x') > 0:
+            dataInt = int(dataStr, base=16)
         else:
-            arr += dataInt.to_bytes(1, byteorder='little')
-    elif dataTypeStr == 'i8':
-        value = dataInt.to_bytes(1, byteorder='little',  signed=True )
-        arr += value
-    elif dataTypeStr == 'u8':
-        if dataInt < 0:
-            return arr
-        else:
-            value = dataInt.to_bytes(1, byteorder='little')
+            dataInt = int(dataStr)
+            
+        if dataTypeStr == 'boolean':
+            if dataInt != 0 or dataInt != 1:
+                return arr
+            else:
+                arr += dataInt.to_bytes(1, byteorder='little')
+        elif dataTypeStr == 'i8':
+            value = dataInt.to_bytes(1, byteorder='little',  signed=True )
             arr += value
-    elif dataTypeStr == 'i16':
-        value = dataInt.to_bytes(2, byteorder='little',  signed=True )
-        arr += value
-    elif dataTypeStr == 'u16':
-        if dataInt < 0:
-            return arr
-        else:
-            value = dataInt.to_bytes(2, byteorder='little')
+        elif dataTypeStr == 'u8':
+            if dataInt < 0:
+                return arr
+            else:
+                value = dataInt.to_bytes(1, byteorder='little')
+                arr += value
+        elif dataTypeStr == 'i16':
+            value = dataInt.to_bytes(2, byteorder='little',  signed=True )
             arr += value
-    elif dataTypeStr == 'i32':
-        value = dataInt.to_bytes(4, byteorder='little',  signed=True )
-        arr += value
-    elif dataTypeStr == 'u32':
-        if dataInt < 0:
-            return arr
-        else:
-            value = dataInt.to_bytes(4, byteorder='little')
+        elif dataTypeStr == 'u16':
+            if dataInt < 0:
+                return arr
+            else:
+                value = dataInt.to_bytes(2, byteorder='little')
+                arr += value
+        elif dataTypeStr == 'i32':
+            value = dataInt.to_bytes(4, byteorder='little',  signed=True )
             arr += value
-    elif dataTypeStr == 'i64':
-        value = dataInt.to_bytes(8, byteorder='little',  signed=True )
-        arr += value
-    elif dataTypeStr == 'u64': # u64
-        if dataInt < 0:
-            return arr
-        else:
-            value = dataInt.to_bytes(8, byteorder='little')
+        elif dataTypeStr == 'u32':
+            if dataInt < 0:
+                return arr
+            else:
+                value = dataInt.to_bytes(4, byteorder='little')
+                arr += value
+        elif dataTypeStr == 'i64':
+            value = dataInt.to_bytes(8, byteorder='little',  signed=True )
             arr += value
+        elif dataTypeStr == 'u64': # u64
+            if dataInt < 0:
+                return arr
+            else:
+                value = dataInt.to_bytes(8, byteorder='little')
+                arr += value
+    except Exception:
+        arr = []
     
         
     return arr
@@ -134,7 +160,14 @@ async def process_form(
     # Qui aggiungi CRC, COBS, framing ecc.
     # Convert inputs to bytes (assuming 16-bit unsigned integers)
     
-    nodeID,commandStr,index,subIndex,dataTypeStr,dataStr = splitTextCommand(inputString)
+    nodeID,commandStr,index,subIndex,dataTypeStr,dataStr, err = splitTextCommand(inputString)
+    
+    if err == 1:
+        result = "Command not recognized: wrong number of parameters"
+        return templates.TemplateResponse("form.html", {"request": request, "result": result})
+    elif err == 2:
+        result = "Command not recognized: impossible to convert to int one or more parameters"
+        return templates.TemplateResponse("form.html", {"request": request, "result": result})
     
     commandInt = convertCommandStrToInt(commandStr)
     dataTypeInt = convertDataTypeStrToInt(dataTypeStr)
