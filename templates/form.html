@@ -1,38 +1,10 @@
 <!DOCTYPE html>
-<html>
-<head><title>Form CRC</title></head>
-<body>
-  <h1>Inserisci i dati</h1>
-  <p>Several notes about data convertion: </br>
-    <ul>
-      <li>fist byte and last one will always be 0 to indicate start of packet and its end</li>
-      <li>second byte is the number of bytes for the next 0 expected</li>
-      <li>third byte will always be 16 (0x10) for type identification packet instruction</li>
-    </ul>
-  </p>
-  </br>
-  <form method="post" action="/process">
-    <label>Text Version: example "54 w 0x1234 99 u8 99", "1 w 0x32 1 i16 -12343"</label>
-    <input type="text" name="commandTxt" required><br>
-    <button type="submit">Invia</button>
-  </form>
-  {% if result %}
-    <h2>Risultato:</h2>
-    <p>{{ result }}</p>
-  {% endif %}
-</body>
-</html>
-
-
-
-
-<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>WebCOBsFramer - String to Byte Code Converter</title>
-    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="templates/style.css">
 </head>
 <body>
     <div class="container">
@@ -48,7 +20,7 @@
         <form id="converterForm" method="post" action="/process">
             <div class="form-section">
                 <div class="form-group">
-                    <label for="inputString">Input String</label>
+                    <label for="inputString">Input String: 5 w 0x2601 5 u16 250</label>
                     <textarea id="inputString" name="inputString" placeholder="Enter your string to convert: i.e 54 w 0x1234 99 u8 99 or 1 w 0x32 1 i16 -12343" required></textarea>
                 </div>
 
@@ -92,6 +64,10 @@
                   <p>{{ result }}</p>
                 {% endif %}
             </div>
+            {% if result %}
+              <p>{{ result }}</p>
+              <stript>console.log({ result })</stript>
+            {% endif %}
         </div>
 
         <div class="footer">
@@ -103,11 +79,11 @@
         
 
         // Clear form function
-        function clearForm() {
-            document.getElementById('converterForm').reset();
-            document.getElementById('outputSection').style.display = 'none';
-            document.getElementById('loadingIndicator').style.display = 'none';
-        }
+       function clearForm() {
+           document.getElementById('converterForm').reset();
+           document.getElementById('outputSection').style.display = 'none';
+           document.getElementById('loadingIndicator').style.display = 'none';
+       }
 
         // Add some interactive feedback
         document.addEventListener('DOMContentLoaded', function() {
