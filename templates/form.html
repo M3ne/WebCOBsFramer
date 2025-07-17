@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>WebCOBsFramer - String to Byte Code Converter</title>
-    <link rel="stylesheet" href="templates/style.css">
+    <link href="{{ url_for('static', path='/style.css') }}" rel="stylesheet">
 </head>
 <body>
     <div class="container">
@@ -54,20 +54,16 @@
             <div>Processing your request...</div>
         </div>
 
-        <div class="output-section" id="outputSection" style="display: none;">
+        <div class="output-section" id="outputSection">
             <div class="output-header">
                 <span class="status-indicator"></span>
                 Converted Byte Code Output
             </div>
             <div class="output-content" id="outputContent">
                 {% if result %}
-                  <p>{{ result }}</p>
+                  {{ result }}
                 {% endif %}
             </div>
-            {% if result %}
-              <p>{{ result }}</p>
-              <stript>console.log({ result })</stript>
-            {% endif %}
         </div>
 
         <div class="footer">
@@ -78,27 +74,27 @@
     <script>
         
 
-        // Clear form function
-       function clearForm() {
-           document.getElementById('converterForm').reset();
-           document.getElementById('outputSection').style.display = 'none';
-           document.getElementById('loadingIndicator').style.display = 'none';
-       }
+    //    // Clear form function
+    //   function clearForm() {
+    //       document.getElementById('converterForm').reset();
+    //       document.getElementById('outputSection').style.display = 'none';
+    //       document.getElementById('loadingIndicator').style.display = 'none';
+    //   }
 
-        // Add some interactive feedback
-        document.addEventListener('DOMContentLoaded', function() {
-            const inputs = document.querySelectorAll('input, textarea, select');
-            inputs.forEach(input => {
-                input.addEventListener('focus', function() {
-                    this.parentElement.style.transform = 'translateY(-2px)';
-                    this.parentElement.style.transition = 'transform 0.3s ease';
-                });
-                
-                input.addEventListener('blur', function() {
-                    this.parentElement.style.transform = 'translateY(0)';
-                });
-            });
-        });
+    //    // Add some interactive feedback
+    //    document.addEventListener('DOMContentLoaded', function() {
+    //        const inputs = document.querySelectorAll('input, textarea, select');
+    //        inputs.forEach(input => {
+    //            input.addEventListener('focus', function() {
+    //                this.parentElement.style.transform = 'translateY(-2px)';
+    //                this.parentElement.style.transition = 'transform 0.3s ease';
+    //            });
+    //            
+    //            input.addEventListener('blur', function() {
+    //                this.parentElement.style.transform = 'translateY(0)';
+    //            });
+    //        });
+    //    });
     </script>
 </body>
 </html>

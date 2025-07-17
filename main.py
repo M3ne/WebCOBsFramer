@@ -13,9 +13,11 @@ crc16_func = crcmod.mkCrcFun(0x11021, rev=False, initCrc=0xFFFF, xorOut=0x0000)
 
 
 app = FastAPI()
-app.mount("/templates/", StaticFiles(directory="templates", html=True), name="templates")
+
+app.mount("/static", StaticFiles(directory="static", html=True), name="static")
 
 templates = Jinja2Templates(directory="templates")
+
 
 @app.get("/", response_class=HTMLResponse)
 async def form_page(request: Request):
@@ -24,7 +26,7 @@ async def form_page(request: Request):
 
 
 def splitTextCommand(cmd:str):
-    
+    cmd = cmd.strip()
     cmd_splitted= cmd.split(' ',6)
     nodeID = int(cmd_splitted[0])
     command = cmd_splitted[1]
@@ -132,7 +134,6 @@ async def process_form(
     # Qui aggiungi CRC, COBS, framing ecc.
     # Convert inputs to bytes (assuming 16-bit unsigned integers)
     
-    
     nodeID,commandStr,index,subIndex,dataTypeStr,dataStr = splitTextCommand(inputString)
     
     commandInt = convertCommandStrToInt(commandStr)
@@ -144,7 +145,6 @@ async def process_form(
             result = "Command not recognized: Second element wrong (use w or r)"
         else:
             result = "Command not recognized: Fifth element wrong (use <boolean, i8, u8, i16, u16, i32, u32, i64, u64>)"
-        
         return templates.TemplateResponse("form.html", {"request": request, "result": result})
     
     payloadArr = []
@@ -158,7 +158,9 @@ async def process_form(
     data_array = bytearray(b'')
     
     if frameType != 'none':
-        data_array += int(frameType, base=16).to_bytes(1, byteorder='little')
+        frameTypeint = int(frameType, base=16)
+        print(frameType)
+        data_array += frameTypeint.to_bytes(1, byteorder='little')
     
     data_array += nodeID.to_bytes(1, byteorder='little')
     data_array += commandInt.to_bytes(1, byteorder='little')
@@ -177,11 +179,13 @@ async def process_form(
     
     # Encode using COBS and add frame delimiter
     if len(frameDelimiter) > 0:
-        frameDelimiter = int(frameDelimiter,base=16)
-        encoded  = frameDelimiter.to_bytes(1, byteorder='little') + cobs.encode(frame) + frameDelimiter.to_bytes(1, byteorder='little')
+        frameDelimiterInt = int(frameDelimiter, base=16)
+        encoded  = frameDelimiterInt.to_bytes(1, byteorder='little') + cobs.encode(frame) + frameDelimiterInt.to_bytes(1, byteorder='little')
     else:
         encoded  = cobs.encode(frame)
 
     result_list = [f"0x{b:02X}" for b in encoded]
-    result = f"Ricevuto: [{', '.join(result_list)}]"
+    result = f"[{', '.join(result_list)}]"
+    
+    print(result)
     return templates.TemplateResponse("form.html", {"request": request, "result": result})
