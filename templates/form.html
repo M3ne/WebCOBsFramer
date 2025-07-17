@@ -22,3 +22,107 @@
   {% endif %}
 </body>
 </html>
+
+
+
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WebCOBsFramer - String to Byte Code Converter</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="logo">WebCOBsFramer</div>
+            <div class="subtitle">String to Byte Code Converter</div>
+            <div class="description">
+                Convert strings to byte code using <span class="tech-badge">COBs Protocol</span> 
+                with <span class="tech-badge">CRC</span> validation
+            </div>
+        </div>
+
+        <form id="converterForm" method="post" action="/process">
+            <div class="form-section">
+                <div class="form-group">
+                    <label for="inputString">Input String</label>
+                    <textarea id="inputString" name="inputString" placeholder="Enter your string to convert: i.e 54 w 0x1234 99 u8 99 or 1 w 0x32 1 i16 -12343" required></textarea>
+                </div>
+
+                <div class="input-group">
+                    <div class="form-group">
+                        <label for="frameType">Frame Type</label>
+                        <select id="frameType" name="frameType">
+                            <option value="16">0x10</option>
+                            <option value="none">None</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="delimiter">Frame Delimiter</label>
+                        <input type="text" id="delimiter" name="frameDelimiter" value="0x00" placeholder="0x00">
+                    </div>
+                </div>
+            </div>
+
+            <div class="button-group">
+                <button type="submit" class="btn btn-primary">
+                    🔄 Convert to Byte Code
+                </button>
+                <button type="button" class="btn btn-secondary" onclick="clearForm()">
+                    🗑️ Clear All
+                </button>
+            </div>
+        </form>
+
+        <div class="loading" id="loadingIndicator">
+            <div class="spinner"></div>
+            <div>Processing your request...</div>
+        </div>
+
+        <div class="output-section" id="outputSection" style="display: none;">
+            <div class="output-header">
+                <span class="status-indicator"></span>
+                Converted Byte Code Output
+            </div>
+            <div class="output-content" id="outputContent">
+                {% if result %}
+                  <p>{{ result }}</p>
+                {% endif %}
+            </div>
+        </div>
+
+        <div class="footer">
+            <p>Powered by Menegazzo Carlo</p>
+        </div>
+    </div>
+
+    <script>
+        
+
+        // Clear form function
+        function clearForm() {
+            document.getElementById('converterForm').reset();
+            document.getElementById('outputSection').style.display = 'none';
+            document.getElementById('loadingIndicator').style.display = 'none';
+        }
+
+        // Add some interactive feedback
+        document.addEventListener('DOMContentLoaded', function() {
+            const inputs = document.querySelectorAll('input, textarea, select');
+            inputs.forEach(input => {
+                input.addEventListener('focus', function() {
+                    this.parentElement.style.transform = 'translateY(-2px)';
+                    this.parentElement.style.transition = 'transform 0.3s ease';
+                });
+                
+                input.addEventListener('blur', function() {
+                    this.parentElement.style.transform = 'translateY(0)';
+                });
+            });
+        });
+    </script>
+</body>
+</html>

@@ -122,13 +122,15 @@ def convertDataStrToBytes(dataStr:str, dataTypeStr:str):
 @app.post("/process", response_class=HTMLResponse)
 async def process_form(
     request: Request,
-    commandTxt: str = Form(...)
+    inputString: str = Form(...),
+    frameType: str = Form(...),
+    frameDelimiter: str = Form(...)
 ):
     # Qui aggiungi CRC, COBS, framing ecc.
     # Convert inputs to bytes (assuming 16-bit unsigned integers)
     
     
-    nodeID,commandStr,index,subIndex,dataTypeStr,dataStr = splitTextCommand(commandTxt)
+    nodeID,commandStr,index,subIndex,dataTypeStr,dataStr = splitTextCommand(inputString)
     
     commandInt = convertCommandStrToInt(commandStr)
     dataTypeInt = convertDataTypeStrToInt(dataTypeStr)
@@ -150,9 +152,11 @@ async def process_form(
         result = "Command not recognized: last element wrong (number to be complient with the type)"
         return templates.TemplateResponse("form.html", {"request": request, "result": result})
 
-    
     data_array = bytearray(b'')
-    data_array += 0x10.to_bytes(1, byteorder='little')
+    
+    if frameType != 'none':
+        data_array += int(frameType, base=16).to_bytes(1, byteorder='little')
+    
     data_array += nodeID.to_bytes(1, byteorder='little')
     data_array += commandInt.to_bytes(1, byteorder='little')
     data_array += index.to_bytes(2, byteorder='little')
@@ -166,9 +170,14 @@ async def process_form(
 
     # Final frame = data + CRC
     frame = data_array + crc_bytes
-
-    # Encode using COBS
-    encoded  = 0x0.to_bytes(1, byteorder='little') + cobs.encode(frame) + 0x0.to_bytes(1, byteorder='little')
+    
+    
+    # Encode using COBS and add frame delimiter
+    if len(frameDelimiter) > 0:
+        frameDelimiter = int(frameDelimiter,base=16)
+        encoded  = frameDelimiter.to_bytes(1, byteorder='little') + cobs.encode(frame) + frameDelimiter.to_bytes(1, byteorder='little')
+    else:
+        encoded  = cobs.encode(frame)
 
     result_list = [f"0x{b:02X}" for b in encoded]
     result = f"Ricevuto: [{', '.join(result_list)}]"
