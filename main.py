@@ -191,8 +191,7 @@ async def process_form(
     data_array = bytearray(b'')
     
     if frameType != 'none':
-        frameTypeint = int(frameType, base=16)
-        print(frameType)
+        frameTypeint = int(frameType)
         data_array += frameTypeint.to_bytes(1, byteorder='little')
     
     data_array += nodeID.to_bytes(1, byteorder='little')
