@@ -17,12 +17,6 @@ Website having as input some parameters. The backend concatenate those data, app
 - Install dependencies in requirements.txt
  `pip install -r .\requirements.txt `
 
-
-> - Local server could be create with fastAPI server:
->
->	- Install fastapi:
- >`pip install "fastapi[standard]" `
->
 >	- Run server:
 > `fastapi.exe dev .\main.py `
  
@@ -31,3 +25,6 @@ Website having as input some parameters. The backend concatenate those data, app
 
 Result:
 ![WebCOBsFramer interface](/images/landingPage.png)
+
+# Further Improvements
+[] Add number of bytes in the output section
