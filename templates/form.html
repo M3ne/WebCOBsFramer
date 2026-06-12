@@ -59,6 +59,11 @@
                 <span class="status-indicator"></span>
                 Converted Byte Code Output
             </div>
+            <div class="output-content-inputString" id="inputStringOutput">
+                {% if inputString %}
+                  {{ inputString }}
+                {% endif %}
+            </div>
             <div class="output-content" id="outputContent">
                 {% if result %}
                   {{ result }}

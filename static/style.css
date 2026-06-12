@@ -177,6 +177,19 @@ textarea {
     text-align: center;
 }
 
+.output-content-inputString {
+    font-family: 'Consolas', 'Monaco', monospace;
+    background: #f1f5f9;
+    color: #065818;
+    padding: 15px;
+    border-radius: 10px;
+    font-size: 0.9em;
+    line-height: 1.5;
+    overflow-x: auto;
+    word-break: keep-all;
+    text-align: left;
+}
+
 .loading {
     display: none;
     text-align: center;
