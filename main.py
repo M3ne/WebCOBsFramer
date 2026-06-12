@@ -5,6 +5,7 @@ from fastapi.staticfiles import StaticFiles
 import uvicorn
 from cobs import cobs
 import crcmod
+import struct
 
 
 
@@ -89,18 +90,30 @@ def convertDataTypeStrToInt(dataTypeStr:str):
         dataTypeInt = 7
     elif dataTypeStr == "u64":
         dataTypeInt = 8
-        
-    
+    elif dataTypeStr == "r32":
+        dataTypeInt = 9        
+    elif dataTypeStr == "r64":
+        dataTypeInt = 10
+
     return dataTypeInt
 
 def convertDataStrToBytes(dataStr:str, dataTypeStr:str):
     arr =  bytearray(b'')
+    dataTypeStr = dataTypeStr.lower()
+
     #TODO: change this in case of other data type are handled
     try:
-        if dataStr.count('0x') > 0:
-            dataInt = int(dataStr, base=16)
+        # Try to convert the data string to int and float, considering also the possibility of hexadecimal representation. If the conversion fails, an exception will be raised and an empty array will be returned.
+        if dataTypeStr == 'r32' or dataTypeStr == 'r64':
+            if dataStr.count('0x') > 0:
+                dataFloat = float(dataStr, base=16)
+            else:
+                dataFloat = float(dataStr)
         else:
-            dataInt = int(dataStr)
+            if dataStr.count('0x') > 0:
+                dataInt = int(dataStr, base=16)
+            else:
+                dataInt = int(dataStr)
             
         if dataTypeStr == 'boolean':
             if dataInt != 0 or dataInt != 1:
@@ -137,12 +150,19 @@ def convertDataStrToBytes(dataStr:str, dataTypeStr:str):
         elif dataTypeStr == 'i64':
             value = dataInt.to_bytes(8, byteorder='little',  signed=True )
             arr += value
-        elif dataTypeStr == 'u64': # u64
+        elif dataTypeStr == 'u64':
             if dataInt < 0:
                 return arr
             else:
                 value = dataInt.to_bytes(8, byteorder='little')
                 arr += value
+        elif dataTypeStr == 'r32':
+            # convert float value to bytes
+            value = bytearray(struct.pack("f", dataFloat))
+            arr += value
+        elif dataTypeStr == 'r64':
+            value = bytearray(struct.pack("d", dataFloat))
+            arr += value
     except Exception:
         arr = []
     
@@ -177,7 +197,7 @@ async def process_form(
         if commandInt == -1:
             result = "Command not recognized: Second element wrong (use w or r)"
         else:
-            result = "Command not recognized: Fifth element wrong (use <boolean, i8, u8, i16, u16, i32, u32, i64, u64>)"
+            result = "Command not recognized: Fifth element wrong (use <boolean, i8, u8, i16, u16, i32, u32, i64, u64, r32, r64>)"
         return templates.TemplateResponse("form.html", {"request": request, "result": result})
     
     payloadArr = []
@@ -220,4 +240,4 @@ async def process_form(
     result = f"[{', '.join(result_list)}]"
     
     print(result)
-    return templates.TemplateResponse("form.html", {"request": request, "result": result})
+    return templates.TemplateResponse("form.html", {"request": request, "result": result, "inputString": inputString})
